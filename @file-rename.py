@@ -2,7 +2,7 @@ import os
 import re 
 
 # List of acronyms/exceptions that should conform to a specific format. i.e. WPF instead of Wpf and .NET instead of Net
-specialCases = ["ASP.NET",".NET","ASP","WPF","GUI","SQL", "JS", "PHP"] # ASP.NET has to come before ASP and .NET
+specialCases = ["ASP.NET",".NET","ASP","WPF","GUI","SQL", "JS", "PHP","IO"] # ASP.NET has to come before ASP and .NET
 suffixesToRemove = ["annas-archive","annas archive"]
 ordinalIndicaters =["st","rd","th"]
 
@@ -89,7 +89,7 @@ def renameFile(inputName:str):
 def renameAll():
     names = os.listdir()
     for name in names:
-        if name != ".git" and name != ".vscode" and name != "file-rename.py":
+        if name != ".git" and name != ".vscode" and name != "@file-rename.py":
             renameFile(name)
 
 def main(argv):
