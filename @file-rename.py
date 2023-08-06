@@ -1,21 +1,18 @@
 import os
 import re 
 
-# List of acronyms/exceptions that should conform to a specific format. i.e. WPF instead of Wpf and .NET instead of Net
-specialCases = ["ASP.NET",".NET","ASP","WPF","GUI","SQL", "JS", "PHP","IO"] # ASP.NET has to come before ASP and .NET
+# List of acronyms/exceptions that should conform to a specific format. 
+# i.e. WPF instead of Wpf and .NET instead of Net
+# Compound form like ASP.NET has to come before standalone form like ASP and .NET
+specialCases = [
+    "ASP.NET",".NET","ASP","WPF","GUI",
+    "SQL", "SQLite", "JS", "PHP", "IO", 
+    "MVC", "APIs", "API", "AI","HTML5",
+    "HTML"
+    ] 
+
 suffixesToRemove = ["annas-archive","annas archive"]
 ordinalIndicaters =["st","rd","th"]
-
-def getSpecialCases(input:str):
-    output = []
-    for case in specialCases:
-        if case == input:
-            output.append(case)
-
-class Renamable:
-    def __init__(self,name):
-        self.beforeName = name
-        self.specialCases = getSpecialCases(name)
 
 def ruleReplaceDash(input:str):
     return input.replace("-"," ")
@@ -63,16 +60,18 @@ rules = [
 def saveSpecialCases(input:str):
     output = []
     count = 0
-    input = input.lower()
+    split = tuple(input.rsplit(".",1))
+    nameOnly = split[0].lower()
     for case in specialCases:
-        if input.find(case.lower()) != -1:
+        pattern = "(^|\s)" + case.lower() + "(\s|$)"
+        if re.search(pattern, nameOnly):
             placeholder = "§" + str(count)
             count = count + 1
-            input = input.replace(case.lower(),placeholder)
+            nameOnly = nameOnly.replace(case.lower(),placeholder)
             output.append((placeholder,case))
-    print("input",input)
-    print("output",output)
-    return (input, output)
+    print("input",nameOnly)
+    print("SpecialCases",output)
+    return (nameOnly+ "." + split[1], output)
 
 def renameFile(inputName:str):
     print("inputName",inputName)
