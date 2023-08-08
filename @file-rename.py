@@ -63,7 +63,7 @@ def saveSpecialCases(input:str):
     split = tuple(input.rsplit(".",1))
     nameOnly = split[0].lower()
     for case in specialCases:
-        pattern = f"(^|\s){case.lower()}(\s|$)"
+        pattern = f"(^|\\s){case.lower()}(\\s|$)"
         if re.search(pattern, nameOnly):
             placeholder = f"§{str(count)}"
             count = count + 1
