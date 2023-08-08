@@ -1,11 +1,9 @@
 import os
 import re
 
-# List of acronyms/exceptions that should
-# conform to a specific format.
+# List of acronyms/exceptions that should conform to a specific format.
 # i.e. WPF instead of Wpf and .NET instead of Net
-# Compound form like ASP.NET has to come before
-# standalone form like ASP and .NET
+# Compound form like ASP.NET has to come before single form like ASP and .NET
 specialCases = [
     "ASP.NET", ".NET", "ASP", "WPF", "GUI",
     "SQL", "SQLite", "JS", "PHP", "IO",
