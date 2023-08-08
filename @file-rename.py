@@ -25,15 +25,15 @@ def ruleReplacePeriod(input:str):
     nameSplit = splits[0:len(splits)-1]
     extension = splits[len(splits)-1:len(splits)][0]
     name = " ".join(nameSplit)
-    return  name + "." + extension
+    return  f"{name}.{extension}"
 
 def ruleTitleCase(input:str):
     splits = input.split(".")
-    return splits[0].title() + "." + splits[1]
+    return f"{splits[0].title()}.{splits[1]}"
 
 def ruleOrdinalIndicatorCase(input:str):
     var = input
-    for rTup in re.findall(r"(\d(Nd|Rd|Th))",input) :
+    for rTup in re.findall(r"(\d(Nd|Rd|Th))",input):
         var = var.replace(rTup[0], rTup[0].lower())
     return var
 
@@ -45,7 +45,7 @@ def ruleRemoveSuffixes(input:str):
     val = split[0]
     for suffix in suffixesToRemove:
         val = val.lower().removesuffix(suffix.lower()).rstrip()
-    return val + "." + split[1]
+    return f"{val}.{split[1]}"
 
 rules = [
     ruleReplaceDash,
@@ -63,15 +63,15 @@ def saveSpecialCases(input:str):
     split = tuple(input.rsplit(".",1))
     nameOnly = split[0].lower()
     for case in specialCases:
-        pattern = "(^|\s)" + case.lower() + "(\s|$)"
+        pattern = f"(^|\s){case.lower()}(\s|$)"
         if re.search(pattern, nameOnly):
-            placeholder = "§" + str(count)
+            placeholder = f"§{str(count)}"
             count = count + 1
             nameOnly = nameOnly.replace(case.lower(),placeholder)
             output.append((placeholder,case))
     print("input",nameOnly)
     print("SpecialCases",output)
-    return (nameOnly+ "." + split[1], output)
+    return (f"{nameOnly}.{split[1]}", output)
 
 def renameFile(inputName:str):
     print("inputName",inputName)
