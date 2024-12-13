@@ -1,18 +1,50 @@
 import os
 import re
 
-# List of acronyms/exceptions that should conform to a specific format.
+# List of acronyms/exceptions that should conform to a specific format
 # i.e. WPF instead of Wpf and .NET instead of Net
-# Compound form like ASP.NET has to come before single form like ASP and .NET
+# Compound form like ASP.NET has to come before standalone form like ASP and .NET
 specialCases = [
     "ASP.NET", ".NET", "ASP", "WPF", "GUI",
     "SQL", "SQLite", "JS", "PHP", "IO",
     "MVC", "APIs", "API", "AI", "HTML5",
-    "HTML"
-    ]
+    "HTML", "LoRa", "MicroPython", "IoT",
+    "LLM", "EF", "TCP", "IP", "DuckDB"
+]
 
-suffixesToRemove = ["annas-archive", "annas archive"]
 ordinalIndicaters = ["st", "rd", "th"]
+
+
+def ruleReplaceHex92(input: str):
+    split = tuple(input.rsplit(".", 1))
+    extension = split[1]
+    name = split[0]
+    name = name.replace("’", "'")
+    return name + "." + extension
+
+
+def ruleAnnaTruncateAfterDoubleDash(input: str):
+    split = tuple(input.rsplit(".", 1))
+    extension = split[1]
+    name = split[0]
+    while True:
+        index = name.rfind("--")
+        if index == -1:
+            break
+        name = name[0:index]
+    return name + "." + extension
+
+
+def ruleRemoveBracketContent(input: str):
+    split = tuple(input.rsplit(".", 1))
+    extension = split[1]
+    name = split[0]
+    while True:
+        index = name.rfind("(")
+        if index == -1:
+            break
+        name = name[0:index]
+    return name + "." + extension
 
 
 def ruleReplaceDash(input: str):
@@ -28,12 +60,20 @@ def ruleReplacePeriod(input: str):
     nameSplit = splits[0:len(splits)-1]
     extension = splits[len(splits)-1:len(splits)][0]
     name = " ".join(nameSplit)
-    return f"{name}.{extension}"
+    return name + "." + extension
 
 
 def ruleTitleCase(input: str):
     splits = input.split(".")
-    return f"{splits[0].title()}.{splits[1]}"
+    return splits[0].title() + "." + splits[1]
+
+
+def rulePreserveApostrophe(input: str):
+    split = tuple(input.rsplit(".", 1))
+    extension = split[1]
+    name = split[0]
+    newName = name.replace("'S", "'s")
+    return newName + "." + extension
 
 
 def ruleOrdinalIndicatorCase(input: str):
@@ -44,24 +84,20 @@ def ruleOrdinalIndicatorCase(input: str):
 
 
 def ruleTrim(input: str):
-    return input.strip()
-
-
-def ruleRemoveSuffixes(input: str):
-    split = tuple(input.rsplit(".", 1))
-    val = split[0]
-    for suffix in suffixesToRemove:
-        val = val.lower().removesuffix(suffix.lower()).rstrip()
-    return f"{val}.{split[1]}"
+    splits = input.split(".")
+    return splits[0].strip() + "." + splits[1].strip()
 
 
 rules = [
+    ruleAnnaTruncateAfterDoubleDash,
+    ruleRemoveBracketContent,
+    ruleReplaceHex92,
     ruleReplaceDash,
     ruleReplaceUnderscore,
     ruleReplacePeriod,
-    ruleRemoveSuffixes,
     ruleTitleCase,
     ruleOrdinalIndicatorCase,
+    rulePreserveApostrophe,
     ruleTrim
 ]
 
@@ -72,15 +108,14 @@ def saveSpecialCases(input: str):
     split = tuple(input.rsplit(".", 1))
     nameOnly = split[0].lower()
     for case in specialCases:
-        pattern = f"(^|\\s){case.lower()}(\\s|$)"
+        pattern = "(^|\\s)" + case.lower() + "(\\s|$)"
         if re.search(pattern, nameOnly):
-            placeholder = f"§{str(count)}"
+            placeholder = "§" + str(count)
             count = count + 1
             nameOnly = nameOnly.replace(case.lower(), placeholder)
             output.append((placeholder, case))
-    print("input", nameOnly)
-    print("SpecialCases", output)
-    return (f"{nameOnly}.{split[1]}", output)
+    print("input", nameOnly, "SpeicalCases:", output)
+    return (nameOnly + "." + split[1], output)
 
 
 def renameFile(inputName: str):
@@ -88,11 +123,14 @@ def renameFile(inputName: str):
     specials = saveSpecialCases(inputName)
     newName: str = str(specials[0])
     for rule in rules:
-        newName = rule(newName)
-        print("newName", newName)
+        alteredName = rule(newName)
+        if newName != alteredName:
+            print("newName", newName, "rule:", rule.__name__)
+        newName = alteredName
     for special in specials[1]:
         newName = newName.replace(special[0], special[1])
-        print("newNameWithSpecials", newName)
+        print("newNameWithSpecials", newName, "special:", special)
+    print()
     os.rename(inputName, newName)
 
 
