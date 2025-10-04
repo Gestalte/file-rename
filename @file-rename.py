@@ -41,7 +41,7 @@ def ruleRemoveBracketContent(input: str):
     name = split[0]
     while True:
         index = name.rfind("(")
-        if index == -1:
+        if index == -1 or index == 0:
             break
         name = name[0:index]
     return name + "." + extension
