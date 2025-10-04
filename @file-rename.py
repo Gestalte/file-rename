@@ -85,12 +85,23 @@ def ruleOrdinalIndicatorCase(input: str):
 
 def ruleTrim(input: str):
     splits = input.split(".")
-    return splits[0].strip() + "." + splits[1].strip()
+    extension = splits[1].strip()
+    name = splits[0]
+    nameSplits = name.split(" ")
+    outputList = []
+    for s in nameSplits:
+        s = s.strip()
+        if s != "":
+            outputList.append(s)
+            s = s + " "
+            print("nameSplit", s)
+    newName = " ".join(outputList)
+    return newName  + "." + extension 
 
 
 rules = [
     ruleAnnaTruncateAfterDoubleDash,
-    ruleRemoveBracketContent,
+    #ruleRemoveBracketContent,
     ruleReplaceHex92,
     ruleReplaceDash,
     ruleReplaceUnderscore,
@@ -114,7 +125,7 @@ def saveSpecialCases(input: str):
             count = count + 1
             nameOnly = nameOnly.replace(case.lower(), placeholder)
             output.append((placeholder, case))
-    print("input", nameOnly, "SpeicalCases:", output)
+    print("input", nameOnly, "SpecialCases:", output)
     return (nameOnly + "." + split[1], output)
 
 
